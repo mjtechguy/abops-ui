@@ -320,7 +320,7 @@ export default function UsersPage() {
                       </Badge>
                     </TableCell>
                     <TableCell>
-                      <Badge variant={userProfile.role === "admin" ? "destructive" : userProfile.role === "editor" ? "default" : "secondary"}>
+                      <Badge variant={userProfile.role === "admin" ? "admin" : userProfile.role === "editor" ? "default" : "secondary"}>
                         {userProfile.role === "admin" ? "Admin" : userProfile.role === "editor" ? "Editor" : "Read Only"}
                       </Badge>
                     </TableCell>
