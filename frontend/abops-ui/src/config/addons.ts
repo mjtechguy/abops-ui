@@ -25,7 +25,14 @@ export interface Addon {
 // Get environment variables for logo paths
 const getLogoPath = (addon: string): string => {
   const envVar = `NEXT_PUBLIC_LOGO_${addon.replace(/-/g, '_').toUpperCase()}`;
-  return process.env[envVar] || `/abops/addons/${addon}.svg`;
+  
+  // Ensure we're accessing Next.js environment variables correctly
+  if (typeof process !== 'undefined' && process.env && process.env[envVar]) {
+    return process.env[envVar];
+  }
+  
+  // Default fallback path
+  return `/abops/addons/${addon}.svg`;
 };
 
 // Define available add-ons
@@ -34,7 +41,7 @@ export const addons: Addon[] = [
     id: 'ingress-nginx',
     name: 'NGINX Ingress Controller',
     description: 'An Ingress controller for Kubernetes using NGINX as a reverse proxy and load balancer',
-    logoPath: getLogoPath('ingress-nginx'),
+    logoPath: '/abops/addons/nginx-96.png',
     category: 'ingress',
     defaultEnabled: false,
     version: '4.7.1',
@@ -44,7 +51,7 @@ export const addons: Addon[] = [
     id: 'traefik',
     name: 'Traefik',
     description: 'A modern HTTP reverse proxy and load balancer for microservices',
-    logoPath: getLogoPath('traefik'),
+    logoPath: '/abops/addons/traefik.png',
     category: 'ingress',
     defaultEnabled: false,
     version: '23.1.0',
@@ -54,7 +61,7 @@ export const addons: Addon[] = [
     id: 'cert-manager',
     name: 'cert-manager',
     description: 'Automated certificate management for Kubernetes',
-    logoPath: getLogoPath('cert-manager'),
+    logoPath: '/abops/addons/cert-manager.png',
     category: 'security',
     defaultEnabled: false,
     version: '1.12.3',
@@ -64,7 +71,7 @@ export const addons: Addon[] = [
     id: 'monitoring',
     name: 'Prometheus & Grafana',
     description: 'Monitoring and visualization for Kubernetes clusters',
-    logoPath: getLogoPath('monitoring'),
+    logoPath: '/abops/addons/grafana.png',
     category: 'monitoring',
     defaultEnabled: false,
     version: '45.27.2',
@@ -74,7 +81,7 @@ export const addons: Addon[] = [
     id: 'logging',
     name: 'ELK Stack',
     description: 'Elasticsearch, Logstash, and Kibana for log collection and analysis',
-    logoPath: getLogoPath('logging'),
+    logoPath: '/abops/addons/elk.png',
     category: 'monitoring',
     defaultEnabled: false,
     version: '8.8.2',
@@ -84,7 +91,7 @@ export const addons: Addon[] = [
     id: 'istio',
     name: 'Istio',
     description: 'Service mesh for connecting, securing, and observing microservices',
-    logoPath: getLogoPath('istio'),
+    logoPath: '/abops/addons/istio.png',
     category: 'service-mesh',
     defaultEnabled: false,
     version: '1.18.2',
@@ -94,7 +101,7 @@ export const addons: Addon[] = [
     id: 'neuvector',
     name: 'NeuVector',
     description: 'Container security platform providing real-time protection',
-    logoPath: getLogoPath('neuvector'),
+    logoPath: '/abops/addons/neuvector.png',
     category: 'security',
     defaultEnabled: false,
     version: '2.6.3',
@@ -104,7 +111,7 @@ export const addons: Addon[] = [
     id: 'harbor',
     name: 'Harbor',
     description: 'Cloud native registry for storing, signing, and scanning container images',
-    logoPath: getLogoPath('harbor'),
+    logoPath: '/abops/addons/harbor.png',
     category: 'storage',
     defaultEnabled: false,
     version: '1.12.2',
@@ -114,7 +121,7 @@ export const addons: Addon[] = [
     id: 'minio',
     name: 'MinIO',
     description: 'High-performance object storage compatible with Amazon S3 API',
-    logoPath: getLogoPath('minio'),
+    logoPath: '/abops/addons/minio.png',
     category: 'storage',
     defaultEnabled: false,
     version: '12.6.9',

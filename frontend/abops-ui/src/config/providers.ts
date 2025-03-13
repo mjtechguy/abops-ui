@@ -11,7 +11,7 @@ export interface Provider {
 
 // Get environment variable with fallback
 const getEnvVar = (key: string, fallback: string): string => {
-  if (typeof window !== 'undefined') {
+  if (typeof process !== 'undefined' && process.env) {
     return process.env[key] || fallback;
   }
   return fallback;
@@ -27,31 +27,31 @@ export const providers: Provider[] = [
     id: "aws", 
     name: "AWS", 
     type: "cloud", 
-    logoPath: getEnvVar('NEXT_PUBLIC_LOGO_AWS', `${logoBaseDir}/aws.svg`) 
+    logoPath: `${logoBaseDir}/aws-96.png` 
   },
   { 
     id: "gcp", 
     name: "Google Cloud", 
     type: "cloud", 
-    logoPath: getEnvVar('NEXT_PUBLIC_LOGO_GCP', `${logoBaseDir}/gcp.svg`) 
+    logoPath: getEnvVar('NEXT_PUBLIC_LOGO_GCP', `${logoBaseDir}/gcp-96.png`) 
   },
   { 
     id: "azure", 
     name: "Azure", 
     type: "cloud", 
-    logoPath: getEnvVar('NEXT_PUBLIC_LOGO_AZURE', `${logoBaseDir}/azure.svg`) 
+    logoPath: getEnvVar('NEXT_PUBLIC_LOGO_AZURE', `${logoBaseDir}/azure-96.png`) 
   },
   { 
     id: "digitalocean", 
     name: "DigitalOcean", 
     type: "cloud", 
-    logoPath: getEnvVar('NEXT_PUBLIC_LOGO_DIGITALOCEAN', `${logoBaseDir}/digitalocean.svg`) 
+    logoPath: getEnvVar('NEXT_PUBLIC_LOGO_DIGITALOCEAN', `${logoBaseDir}/do-96.png`) 
   },
   { 
     id: "oracle", 
     name: "Oracle Cloud", 
     type: "cloud", 
-    logoPath: getEnvVar('NEXT_PUBLIC_LOGO_ORACLE', `${logoBaseDir}/oracle.svg`) 
+    logoPath: getEnvVar('NEXT_PUBLIC_LOGO_ORACLE', `${logoBaseDir}/oracle-96.png`) 
   },
   { 
     id: "hetzner", 
@@ -65,19 +65,19 @@ export const providers: Provider[] = [
     id: "harvester", 
     name: "Harvester", 
     type: "hci", 
-    logoPath: getEnvVar('NEXT_PUBLIC_LOGO_HARVESTER', `${logoBaseDir}/harvester.svg`) 
+    logoPath: getEnvVar('NEXT_PUBLIC_LOGO_HARVESTER', `${logoBaseDir}/harvester.png`) 
   },
   { 
     id: "vmware", 
     name: "VMware", 
     type: "hci", 
-    logoPath: getEnvVar('NEXT_PUBLIC_LOGO_VMWARE', `${logoBaseDir}/vmware.svg`) 
+    logoPath: getEnvVar('NEXT_PUBLIC_LOGO_VMWARE', `${logoBaseDir}/vmware-96.png`) 
   },
   { 
     id: "proxmox", 
     name: "Proxmox", 
     type: "hci", 
-    logoPath: getEnvVar('NEXT_PUBLIC_LOGO_PROXMOX', `${logoBaseDir}/proxmox.svg`) 
+    logoPath: getEnvVar('NEXT_PUBLIC_LOGO_PROXMOX', `${logoBaseDir}/proxmox-96.png`) 
   },
 ];
 
