@@ -1154,6 +1154,7 @@ export default function CreateCluster() {
                                       {version}{version === addon.version ? ' (Default)' : ''}
                                     </option>
                                   ))}
+                                  <a href={addon.link} target="_blank" rel="noopener noreferrer" className="text-xs text-primary underline"></a>
                                 </select>
                               </div>
                               

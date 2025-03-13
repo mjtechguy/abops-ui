@@ -132,6 +132,9 @@ export default function CreateClusterConfirmPage() {
   const [rancherServerDetails, setRancherServerDetails] = useState<RancherServer | null>(null);
   const [rancherCredentialDetails, setRancherCredentialDetails] = useState<RancherCredential | null>(null);
   const [addonDetails, setAddonDetails] = useState<any[]>([]);
+  
+  // Define logo base directory
+  const logoBaseDir = process.env.NEXT_PUBLIC_PROVIDER_LOGOS_DIR || "/abops/providers";
 
   // Mock functions to replace the missing imports
   const getProviderById = (id: string) => {
@@ -436,22 +439,45 @@ export default function CreateClusterConfirmPage() {
             <CardHeader>
               <CardTitle>Basic Information</CardTitle>
             </CardHeader>
-            <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <Label className="font-medium">Cluster Name</Label>
-                <p>{clusterConfig.name}</p>
-              </div>
-              <div>
-                <Label className="font-medium">Provider</Label>
-                <p>{providerDetails?.name || clusterConfig.provider}</p>
-              </div>
-              <div>
-                <Label className="font-medium">Credential</Label>
-                <p>{credentialDetails?.name || 'Not specified'}</p>
-              </div>
-              <div>
-                <Label className="font-medium">Region</Label>
-                <p>{regionDetails?.name || clusterConfig.region}</p>
+            <CardContent>
+              <div className="space-y-4">
+                <div>
+                  <Label className="font-medium">Cluster Name</Label>
+                  <p className="text-lg font-medium">{clusterConfig.name}</p>
+                </div>
+                
+                <div>
+                  <Label className="font-medium">Provider</Label>
+                  <div className="flex items-center mt-1">
+                    {providerDetails && (
+                      <div className="relative h-8 w-8 mr-2">
+                        <Image 
+                          src={`${logoBaseDir}/${clusterConfig.provider}-96.png`} 
+                          alt={providerDetails.name || clusterConfig.provider}
+                          width={32}
+                          height={32}
+                          className="object-contain"
+                          onError={(e) => {
+                            const target = e.target as HTMLImageElement;
+                            target.src = `${logoBaseDir}/${clusterConfig.provider}.svg`;
+                          }}
+                        />
+                      </div>
+                    )}
+                    <p>{providerDetails?.name || clusterConfig.provider}</p>
+                  </div>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <Label className="font-medium">Credential</Label>
+                    <p>{credentialDetails?.name || 'Not specified'}</p>
+                  </div>
+                  <div>
+                    <Label className="font-medium">Region</Label>
+                    <p>{regionDetails?.name || clusterConfig.region}</p>
+                  </div>
+                </div>
               </div>
             </CardContent>
           </Card>
@@ -459,18 +485,35 @@ export default function CreateClusterConfirmPage() {
           {/* Node Configuration */}
           <Card>
             <CardHeader>
-              <CardTitle>Node Configuration</CardTitle>
+              <CardTitle>Operating System & Node Configuration</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
+              <div className="space-y-6">
                 <div>
                   <Label className="font-medium">Operating System</Label>
-                  <p>{osDetails?.name || clusterConfig.os} {clusterConfig.osVersion}</p>
+                  <div className="flex items-center mt-1">
+                    {osDetails && (
+                      <div className="relative h-8 w-8 mr-2">
+                        <Image 
+                          src={osDetails.logoPath || `/abops/os/${clusterConfig.os}.svg`}
+                          alt={osDetails.name || clusterConfig.os}
+                          width={32}
+                          height={32}
+                          className="object-contain"
+                          onError={(e) => {
+                            const target = e.target as HTMLImageElement;
+                            target.src = "/abops/os/default.svg";
+                          }}
+                        />
+                      </div>
+                    )}
+                    <p>{osDetails?.name || clusterConfig.os} {clusterConfig.osVersion}</p>
+                  </div>
                 </div>
                 
                 <div>
-                  <Label className="font-medium">Node Pools</Label>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
+                  <Label className="font-medium mb-2 block">Node Pools</Label>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {Array.isArray(clusterConfig.nodePools) ? clusterConfig.nodePools.map((pool: any, index: number) => (
                       <Card key={index} className="border border-muted">
                         <CardContent className="p-4">
@@ -481,7 +524,7 @@ export default function CreateClusterConfirmPage() {
                           {pool?.vmSize ? (
                             <p className="text-sm">Size: {pool.vmSize}</p>
                           ) : pool?.customSize ? (
-                            <div className="text-sm">
+                            <div className="text-sm space-y-1">
                               <p>CPU: {pool.customSize?.cpu || 0} vCores</p>
                               <p>Memory: {pool.customSize?.memory || 0} GB</p>
                               <p>Storage: {pool.customSize?.storage || 0} GB</p>
@@ -501,49 +544,48 @@ export default function CreateClusterConfirmPage() {
             <CardHeader>
               <CardTitle>Kubernetes Configuration</CardTitle>
             </CardHeader>
-            <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <Label className="font-medium">Distribution</Label>
-                <p>{k8sDistributionDetails?.name || clusterConfig.k8sDistribution}</p>
-              </div>
-              <div>
-                <Label className="font-medium">Version</Label>
-                <p>{clusterConfig.k8sVersion}</p>
-              </div>
-              <div>
-                <Label className="font-medium">Storage Engine</Label>
-                <p>{storageEngineDetails?.name || clusterConfig.storageEngine}</p>
-              </div>
-              {clusterConfig.storageEngine !== 'CloudProvider' && (
-                <div>
-                  <Label className="font-medium">Storage Version</Label>
-                  <p>{clusterConfig.storageVersion}</p>
+            <CardContent>
+              <div className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <Label className="font-medium">Distribution</Label>
+                    <p className="mt-1">{k8sDistributionDetails?.name || clusterConfig.k8sDistribution}</p>
+                  </div>
+                  <div>
+                    <Label className="font-medium">Version</Label>
+                    <p className="mt-1">{clusterConfig.k8sVersion}</p>
+                  </div>
                 </div>
-              )}
+                
+                <div>
+                  <Label className="font-medium">Storage Engine</Label>
+                  <div className="flex items-center mt-1">
+                    {storageEngineDetails && (
+                      <div className="relative h-8 w-8 mr-2">
+                        <Image 
+                          src={`/abops/storage/${clusterConfig.storageEngine}.svg`}
+                          alt={storageEngineDetails.name || clusterConfig.storageEngine}
+                          width={32}
+                          height={32}
+                          className="object-contain"
+                          onError={(e) => {
+                            const target = e.target as HTMLImageElement;
+                            target.src = "/abops/storage/default.svg";
+                          }}
+                        />
+                      </div>
+                    )}
+                    <div>
+                      <p>{storageEngineDetails?.name || clusterConfig.storageEngine}</p>
+                      {clusterConfig.storageEngine !== 'CloudProvider' && (
+                        <p className="text-sm text-muted-foreground">Version: {clusterConfig.storageVersion}</p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
             </CardContent>
           </Card>
-
-          {/* Rancher Management */}
-          {clusterConfig.rancherServer && (
-            <Card>
-              <CardHeader>
-                <CardTitle>Rancher Management</CardTitle>
-              </CardHeader>
-              <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <Label className="font-medium">Rancher Server</Label>
-                  <p>{rancherServerDetails?.name || 'Not specified'}</p>
-                  {rancherServerDetails?.address && (
-                    <p className="text-sm text-muted-foreground">{rancherServerDetails.address}</p>
-                  )}
-                </div>
-                <div>
-                  <Label className="font-medium">Rancher Credential</Label>
-                  <p>{rancherCredentialDetails?.username || 'Not specified'}</p>
-                </div>
-              </CardContent>
-            </Card>
-          )}
 
           {/* Add-ons */}
           {addonDetails.length > 0 && (
@@ -557,11 +599,12 @@ export default function CreateClusterConfirmPage() {
                     <Card key={addon?.id || Math.random().toString()} className="border border-primary">
                       <CardContent className="p-4">
                         <div className="flex items-center space-x-2 mb-2">
-                          <div className="h-6 w-6 relative">
+                          <div className="h-8 w-8 relative">
                             <Image 
                               src={addon?.logoPath || "/abops/addons/default.svg"} 
                               alt={addon?.name || 'Addon'} 
-                              fill 
+                              width={32}
+                              height={32}
                               className="object-contain" 
                               onError={(e) => {
                                 // Fallback if image fails to load
@@ -581,6 +624,30 @@ export default function CreateClusterConfirmPage() {
                       </CardContent>
                     </Card>
                   )) : <p>No addons configured</p>}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Rancher Management */}
+          {clusterConfig.rancherServer && (
+            <Card>
+              <CardHeader>
+                <CardTitle>Rancher Management</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div>
+                    <Label className="font-medium">Rancher Server</Label>
+                    <p>{rancherServerDetails?.name || 'Not specified'}</p>
+                    {rancherServerDetails?.address && (
+                      <p className="text-sm text-muted-foreground">{rancherServerDetails.address}</p>
+                    )}
+                  </div>
+                  <div>
+                    <Label className="font-medium">Rancher Credential</Label>
+                    <p>{rancherCredentialDetails?.username || 'Not specified'}</p>
+                  </div>
                 </div>
               </CardContent>
             </Card>

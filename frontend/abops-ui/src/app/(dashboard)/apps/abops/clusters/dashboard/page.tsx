@@ -32,7 +32,7 @@ export default function ClusterDashboard() {
   return (
     <div className="space-y-6">
       <div className="flex flex-col">
-        <h1 className="text-2xl font-bold tracking-tight">Kubernetes Cluster Dashboard</h1>
+        <h1 className="text-2xl font-bold tracking-tight">ABOps Cluster Dashboard</h1>
         <p className="text-muted-foreground">
           Monitor and manage your Kubernetes clusters across different providers.
         </p>
