@@ -87,6 +87,14 @@ export const mockCredentials: Credential[] = [
     description: 'Proxmox VE cluster for test environments',
     createdAt: '2024-12-25T15:50:00Z',
     lastUsed: '2025-03-01T16:45:00Z'
+  },
+  {
+    id: 'cred-harvester-1',
+    name: 'Harvester Cluster',
+    type: 'harvester',
+    description: 'Harvester HCI environment for containerized workloads',
+    createdAt: '2025-01-15T14:30:00Z',
+    lastUsed: '2025-03-12T10:45:00Z'
   }
 ];
 
