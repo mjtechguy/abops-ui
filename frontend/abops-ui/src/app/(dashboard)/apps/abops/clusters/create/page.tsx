@@ -1154,8 +1154,14 @@ export default function CreateCluster() {
                                       {version}{version === addon.version ? ' (Default)' : ''}
                                     </option>
                                   ))}
-                                  <a href={addon.link} target="_blank" rel="noopener noreferrer" className="text-xs text-primary underline"></a>
                                 </select>
+                                {addon.link && (
+                                  <div className="mt-1">
+                                    <a href={addon.link} target="_blank" rel="noopener noreferrer" className="text-xs text-primary underline">
+                                      View documentation
+                                    </a>
+                                  </div>
+                                )}
                               </div>
                               
                               <div>
@@ -1227,11 +1233,36 @@ export default function CreateCluster() {
               <CardContent>
                 <div className="space-y-4">
                   {[
-                    { id: 'cis', name: 'CIS', description: 'Center for Internet Security Benchmarks' },
-                    { id: 'disa-stig', name: 'DISA STIG', description: 'Defense Information Systems Agency Security Technical Implementation Guides' },
-                    { id: 'nist-800-53', name: 'NIST 800-53', description: 'Security and Privacy Controls for Information Systems and Organizations' },
-                    { id: 'nist-800-190', name: 'NIST 800-190', description: 'Application Container Security Guide' },
-                    { id: 'hipaa', name: 'HIPAA', description: 'Health Insurance Portability and Accountability Act' },
+                    { 
+                      id: 'cis', 
+                      name: 'CIS', 
+                      description: 'Center for Internet Security Benchmarks',
+                      link: 'https://www.cisecurity.org/benchmark/kubernetes'
+                    },
+                    { 
+                      id: 'disa-stig', 
+                      name: 'DISA STIG', 
+                      description: 'Defense Information Systems Agency Security Technical Implementation Guides',
+                      link: 'https://public.cyber.mil/stigs/downloads/'
+                    },
+                    { 
+                      id: 'nist-800-53', 
+                      name: 'NIST 800-53', 
+                      description: 'Security and Privacy Controls for Information Systems and Organizations',
+                      link: 'https://csrc.nist.gov/publications/detail/sp/800-53/rev-5/final'
+                    },
+                    { 
+                      id: 'nist-800-190', 
+                      name: 'NIST 800-190', 
+                      description: 'Application Container Security Guide',
+                      link: 'https://csrc.nist.gov/publications/detail/sp/800-190/final'
+                    },
+                    { 
+                      id: 'hipaa', 
+                      name: 'HIPAA', 
+                      description: 'Health Insurance Portability and Accountability Act',
+                      link: 'https://www.hhs.gov/hipaa/for-professionals/security/index.html'
+                    },
                   ].map((option) => (
                     <div key={option.id} className="flex items-start space-x-3">
                       <div className="flex h-5 items-center">
@@ -1257,6 +1288,17 @@ export default function CreateCluster() {
                           {option.name}
                         </label>
                         <p className="text-xs text-muted-foreground">{option.description}</p>
+                        {option.link && (
+                          <a 
+                            href={option.link} 
+                            target="_blank" 
+                            rel="noopener noreferrer" 
+                            className="text-xs text-primary underline mt-1 block"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            View documentation
+                          </a>
+                        )}
                       </div>
                     </div>
                   ))}

@@ -59,7 +59,7 @@ export const operatingSystems: OperatingSystem[] = [
     id: 'sles',
     name: 'SUSE Linux Enterprise Server',
     description: 'Enterprise-grade Linux distribution with long-term support',
-    logoPath: getLogoPath('sles'),
+    logoPath: `${osLogosDir}/suse-96.png`,
     versions: [
       { id: '15-sp5', name: '15 SP5', isDefault: true },
       { id: '15-sp4', name: '15 SP4' },
@@ -72,7 +72,7 @@ export const operatingSystems: OperatingSystem[] = [
     id: 'sle-micro',
     name: 'SLE Micro',
     description: 'Container and virtualization host designed for edge computing',
-    logoPath: getLogoPath('sle-micro'),
+    logoPath: `${osLogosDir}/suse-96.png`,
     versions: [
       { id: '5.5', name: '5.5', isDefault: true },
       { id: '5.4', name: '5.4' },
@@ -84,7 +84,7 @@ export const operatingSystems: OperatingSystem[] = [
     id: 'opensuse',
     name: 'OpenSUSE Tumbleweed',
     description: 'Rolling-release Linux distribution with the latest packages',
-    logoPath: getLogoPath('opensuse'),
+    logoPath: `${osLogosDir}/suse-96.png`,
     versions: [
       { id: 'latest', name: 'Latest', isDefault: true }
     ],
@@ -94,7 +94,7 @@ export const operatingSystems: OperatingSystem[] = [
     id: 'opensuse-micro',
     name: 'OpenSUSE Micro',
     description: 'Lightweight container host based on openSUSE',
-    logoPath: getLogoPath('opensuse-micro'),
+    logoPath: `${osLogosDir}/suse-96.png`,
     versions: [
       { id: 'latest', name: 'Latest', isDefault: true }
     ],
@@ -104,7 +104,7 @@ export const operatingSystems: OperatingSystem[] = [
     id: 'rhel',
     name: 'Red Hat Enterprise Linux',
     description: 'Enterprise-grade Linux distribution from Red Hat',
-    logoPath: getLogoPath('rhel'),
+    logoPath: `${osLogosDir}/rhel.png`,
     versions: [
       { id: '9.3', name: '9.3', isDefault: true },
       { id: '9.2', name: '9.2' },
@@ -118,7 +118,7 @@ export const operatingSystems: OperatingSystem[] = [
     id: 'ubuntu',
     name: 'Ubuntu',
     description: 'Popular Linux distribution from Canonical',
-    logoPath: getLogoPath('ubuntu'),
+    logoPath: `${osLogosDir}/ubuntu.png`,
     versions: [
       { id: '24.04', name: '24.04 LTS', isDefault: true },
       { id: '22.04', name: '22.04 LTS' },
@@ -130,7 +130,7 @@ export const operatingSystems: OperatingSystem[] = [
     id: 'rocky',
     name: 'Rocky Linux',
     description: 'Community enterprise operating system designed to be 100% compatible with RHEL',
-    logoPath: getLogoPath('rocky'),
+    logoPath: `${osLogosDir}/rocky.png`,
     versions: [
       { id: '9.3', name: '9.3', isDefault: true },
       { id: '9.2', name: '9.2' },
@@ -143,7 +143,7 @@ export const operatingSystems: OperatingSystem[] = [
     id: 'alma',
     name: 'AlmaLinux',
     description: 'Open source, community-owned and governed RHEL fork',
-    logoPath: getLogoPath('alma'),
+    logoPath: `${osLogosDir}/alma.png`,
     versions: [
       { id: '9.3', name: '9.3', isDefault: true },
       { id: '9.2', name: '9.2' },
@@ -156,7 +156,7 @@ export const operatingSystems: OperatingSystem[] = [
     id: 'debian',
     name: 'Debian',
     description: 'Stable and secure Linux distribution',
-    logoPath: getLogoPath('debian'),
+    logoPath: `${osLogosDir}/debian.png`,
     versions: [
       { id: '12', name: '12 (Bookworm)', isDefault: true },
       { id: '11', name: '11 (Bullseye)' },
@@ -168,7 +168,7 @@ export const operatingSystems: OperatingSystem[] = [
     id: 'amazon-linux',
     name: 'Amazon Linux',
     description: 'Linux distribution provided by AWS for use on Amazon EC2',
-    logoPath: getLogoPath('amazon-linux'),
+    logoPath: `${osLogosDir}/aws-96.png`,
     versions: [
       { id: '2023', name: 'Amazon Linux 2023', isDefault: true },
       { id: '2', name: 'Amazon Linux 2' }
