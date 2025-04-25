@@ -1,7 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { providerCredentialsService } from "@/services/credentials";
+import { toast } from "sonner";
 import {
   Card,
   CardContent,
@@ -59,51 +61,47 @@ interface ProviderCredential {
   };
 }
 
-// Mock data for provider credentials
-const initialCredentials: ProviderCredential[] = [
-  {
-    id: "aws-prod-1",
-    name: "AWS Production",
-    provider: "aws",
-    type: "access_key",
-    isDefault: true,
-    createdAt: "2025-01-10T08:00:00Z",
-    data: {
-      accessKey: "AKIA123456789EXAMPLE",
-      secretKey: "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"
-    }
-  },
-  {
-    id: "azure-dev-1",
-    name: "Azure Development",
-    provider: "azure",
-    type: "service_principal",
-    isDefault: true,
-    createdAt: "2025-01-15T10:30:00Z",
-    data: {
-      clientId: "11111111-1111-1111-1111-111111111111",
-      clientSecret: "abcdefghijklmnopqrstuvwxyz123456789",
-      subscriptionId: "22222222-2222-2222-2222-222222222222",
-      tenantId: "33333333-3333-3333-3333-333333333333"
-    }
-  },
-  {
-    id: "gcp-staging-1",
-    name: "GCP Staging",
-    provider: "gcp",
-    type: "service_account",
-    isDefault: true,
-    createdAt: "2025-01-20T14:15:00Z",
-    data: {
-      projectId: "my-gcp-project",
-      keyJson: "{\"type\":\"service_account\",\"project_id\":\"my-gcp-project\"}"
-    }
-  }
-];
-
 export default function ProviderCredentialsPage() {
   const router = useRouter();
-  const [credentials, setCredentials] = useState<ProviderCredential[]>(initialCredentials);
+  const [credentials, setCredentials] = useState<ProviderCredential[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  
+  // Fetch provider credentials from the database
+  useEffect(() => {
+    const fetchCredentials = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        
+        const data = await providerCredentialsService.getAll();
+        
+        // Transform the data to match our component's expected format
+        const transformedCredentials = data.map((cred: any) => ({
+          id: cred.id || '',
+          name: cred.name,
+          provider: cred.provider,
+          type: typeof cred.provider === 'string' ? cred.provider : 'unknown',
+          isDefault: true, // Default to true for now
+          createdAt: cred.created_at || new Date().toISOString(),
+          data: cred.data || {}
+        }));
+        
+        setCredentials(transformedCredentials);
+      } catch (err: any) {
+        console.error('Error fetching provider credentials:', err);
+        // Only set error for actual errors, not for empty data
+        if (err?.message !== 'No data returned from the query.') {
+          setError('Failed to load provider credentials');
+          toast.error('Failed to load provider credentials');
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchCredentials();
+  }, []);
   const [isAddingCredential, setIsAddingCredential] = useState(false);
   const [selectedProvider, setSelectedProvider] = useState("");
   const [credentialToDelete, setCredentialToDelete] = useState<string | null>(null);
@@ -736,10 +734,31 @@ export default function ProviderCredentialsPage() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {credentials.length === 0 ? (
+            {loading ? (
               <TableRow>
-                <TableCell colSpan={6} className="text-center py-4">
-                  No credentials configured. Add provider credentials to get started.
+                <TableCell colSpan={6} className="text-center py-8">
+                  <div className="flex flex-col items-center justify-center gap-2">
+                    <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-primary"></div>
+                    <p>Loading credentials...</p>
+                  </div>
+                </TableCell>
+              </TableRow>
+            ) : credentials.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={6} className="py-12">
+                  <div className="flex flex-col items-center justify-center gap-4">
+                    <div className="rounded-full bg-muted p-3">
+                      <PlusCircle className="h-8 w-8 text-muted-foreground" />
+                    </div>
+                    <h3 className="text-lg font-medium">No provider credentials yet</h3>
+                    <p className="text-sm text-muted-foreground text-center max-w-sm">
+                      You haven't created any provider credentials yet. Add your first credential to start deploying clusters.
+                    </p>
+                    <Button onClick={() => setIsAddingCredential(true)} className="mt-2">
+                      <PlusCircle className="mr-2 h-4 w-4" />
+                      Add Provider Credential
+                    </Button>
+                  </div>
                 </TableCell>
               </TableRow>
             ) : (

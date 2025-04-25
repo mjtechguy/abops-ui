@@ -1,7 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { rancherServersService, rancherCredentialsService } from "@/services/credentials";
+import { toast } from "sonner";
 import {
   Card,
   CardContent,
@@ -43,19 +45,88 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { 
-  RancherServer, 
-  RancherCredential, 
-  rancherServers, 
-  rancherCredentials, 
-  getRancherServerById 
-} from "@/config/rancher-servers";
-import { PlusCircle, Trash2, Edit, Eye, EyeOff } from "lucide-react";
+// Define types for our Rancher servers and credentials
+interface RancherServer {
+  id: string;
+  name: string;
+  address: string;
+  description?: string;
+  createdAt: string;
+}
+
+interface RancherCredential {
+  id: string;
+  serverId: string;
+  username: string;
+  password?: string;
+  token?: string;
+  isDefault: boolean;
+  createdAt: string;
+}
+import { PlusCircle, Trash2, Edit, Eye, EyeOff, Server, Key } from "lucide-react";
 
 export default function RancherCredentialsPage() {
   const router = useRouter();
-  const [servers, setServers] = useState<RancherServer[]>(rancherServers);
-  const [credentials, setCredentials] = useState<RancherCredential[]>(rancherCredentials);
+  const [servers, setServers] = useState<RancherServer[]>([]);
+  const [credentials, setCredentials] = useState<RancherCredential[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  
+  // Function to get server by ID
+  const getRancherServerById = (id: string): RancherServer | undefined => {
+    return servers.find(server => server.id === id);
+  };
+  
+  // Fetch Rancher servers and credentials from the database
+  useEffect(() => {
+    const fetchRancherData = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        
+        // Fetch Rancher servers
+        const serversData = await rancherServersService.getAll();
+        
+        // Transform the servers data
+        const transformedServers = serversData.map((server: any) => ({
+          id: server.id || '',
+          name: server.name,
+          address: server.address,
+          description: server.description,
+          createdAt: server.created_at || new Date().toISOString()
+        }));
+        
+        setServers(transformedServers);
+        
+        // Fetch Rancher credentials
+        const credentialsData = await rancherCredentialsService.getAll();
+        
+        // Transform the credentials data
+        const transformedCredentials = credentialsData.map((cred: any) => ({
+          id: cred.id || '',
+          serverId: cred.server_id,
+          username: cred.username,
+          password: cred.password,
+          token: cred.token,
+          isDefault: cred.is_default || false,
+          createdAt: cred.created_at || new Date().toISOString()
+        }));
+        
+        setCredentials(transformedCredentials);
+      } catch (err: any) {
+        console.error('Error fetching Rancher data:', err);
+        // Only set error for actual errors, not for empty data
+        if (err?.message !== 'No data returned from the query.') {
+          setError('Failed to load Rancher servers and credentials');
+          toast.error('Failed to load Rancher servers and credentials');
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchRancherData();
+  }, []);
   
   // New server form state
   const [isAddingServer, setIsAddingServer] = useState(false);
@@ -240,10 +311,31 @@ export default function RancherCredentialsPage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {servers.length === 0 ? (
+                  {loading ? (
                     <TableRow>
-                      <TableCell colSpan={5} className="text-center py-4">
-                        No servers configured. Add a Rancher server to get started.
+                      <TableCell colSpan={5} className="text-center py-8">
+                        <div className="flex flex-col items-center justify-center gap-2">
+                          <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-primary"></div>
+                          <p>Loading Rancher servers...</p>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ) : servers.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={5} className="py-12">
+                        <div className="flex flex-col items-center justify-center gap-4">
+                          <div className="rounded-full bg-muted p-3">
+                            <Server className="h-8 w-8 text-muted-foreground" />
+                          </div>
+                          <h3 className="text-lg font-medium">No Rancher servers yet</h3>
+                          <p className="text-sm text-muted-foreground text-center max-w-sm">
+                            You haven't added any Rancher servers yet. Add your first Rancher server to start managing clusters.
+                          </p>
+                          <Button onClick={() => setIsAddingServer(true)} className="mt-2">
+                            <PlusCircle className="mr-2 h-4 w-4" />
+                            Add Rancher Server
+                          </Button>
+                        </div>
                       </TableCell>
                     </TableRow>
                   ) : (
@@ -382,10 +474,40 @@ export default function RancherCredentialsPage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {credentials.length === 0 ? (
+                  {loading ? (
                     <TableRow>
-                      <TableCell colSpan={6} className="text-center py-4">
-                        No credentials configured. Add credentials to authenticate with your Rancher servers.
+                      <TableCell colSpan={6} className="text-center py-8">
+                        <div className="flex flex-col items-center justify-center gap-2">
+                          <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-primary"></div>
+                          <p>Loading Rancher credentials...</p>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ) : credentials.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={6} className="py-12">
+                        <div className="flex flex-col items-center justify-center gap-4">
+                          <div className="rounded-full bg-muted p-3">
+                            <Key className="h-8 w-8 text-muted-foreground" />
+                          </div>
+                          <h3 className="text-lg font-medium">No Rancher credentials yet</h3>
+                          <p className="text-sm text-muted-foreground text-center max-w-sm">
+                            You haven't added any Rancher credentials yet. Add credentials to authenticate with your Rancher servers.
+                          </p>
+                          <Button 
+                            onClick={() => setIsAddingCredential(true)} 
+                            className="mt-2"
+                            disabled={servers.length === 0}
+                          >
+                            <PlusCircle className="mr-2 h-4 w-4" />
+                            Add Rancher Credential
+                          </Button>
+                          {servers.length === 0 && (
+                            <p className="text-xs text-muted-foreground mt-2">
+                              You need to add a Rancher server first before adding credentials.
+                            </p>
+                          )}
+                        </div>
                       </TableCell>
                     </TableRow>
                   ) : (

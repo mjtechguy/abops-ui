@@ -14,6 +14,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { toast } from "sonner";
 import { ArrowLeft, ArrowRight, Check, Plus, Minus, Upload, X } from "lucide-react";
 import Link from "next/link";
 
@@ -488,6 +489,8 @@ export default function CreateCluster() {
     }
     
     try {
+      console.log("Next Step button clicked, preparing to navigate to confirmation page...");
+      
       // Prepare URL parameters for the confirmation page
       const params = new URLSearchParams();
       
@@ -520,20 +523,12 @@ export default function CreateCluster() {
       }
       
       // Node pools
-      const nodePoolsConfig = [
-        {
-          role: 'control-plane',
-          count: 1, // Default to 1 control plane node
-          vmSize: nodePools.length > 0 ? nodePools[0].vmSize : null,
-          customSize: nodePools.length > 0 ? nodePools[0].customSize : null
-        },
-        {
-          role: 'worker',
-          count: 2, // Default to 2 worker nodes
-          vmSize: nodePools.length > 1 ? nodePools[1].vmSize : null,
-          customSize: nodePools.length > 1 ? nodePools[1].customSize : null
-        }
-      ];
+      const nodePoolsConfig = nodePools.map(pool => ({
+        role: pool.role,
+        count: pool.count,
+        vmSize: pool.vmSize,
+        customSize: pool.customSize
+      }));
       params.append('nodePools', JSON.stringify(nodePoolsConfig));
       
       // Add-ons
@@ -543,9 +538,18 @@ export default function CreateCluster() {
       params.append('securityOptions', JSON.stringify(securityOptions));
       
       // Navigate to confirmation page
-      router.push(`/apps/abops/clusters/create-confirm?${params.toString()}`);
+      const confirmUrl = `/apps/abops/clusters/create-confirm?${params.toString()}`;
+      console.log("Navigating to:", confirmUrl);
+      router.push(confirmUrl);
     } catch (error) {
       console.error("Error preparing confirmation data:", error);
+      toast.error(
+        "Error", 
+        {
+          description: "An error occurred while preparing the confirmation page. Please try again.",
+          duration: 5000,
+        }
+      );
     }
   };
 
@@ -1451,10 +1455,32 @@ export default function CreateCluster() {
             <ArrowLeft className="mr-2 h-4 w-4" />
             Cancel
           </Button>
-          <Button onClick={handleNext} disabled={!isFormValid}>
-            Next Step
-            <ArrowRight className="ml-2 h-4 w-4" />
-          </Button>
+          <div className="relative group">
+            <Button onClick={handleNext} disabled={!isFormValid}>
+              Next Step
+              <ArrowRight className="ml-2 h-4 w-4" />
+            </Button>
+            {!isFormValid && (
+              <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 w-max max-w-xs bg-black text-white text-xs rounded px-2 py-1 z-10 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none shadow-lg">
+                {(() => {
+                  if (!deploymentName.trim()) return 'Deployment name is required.';
+                  if (nameError) return nameError;
+                  if (!selectedProvider) return 'Provider selection is required.';
+                  if (!selectedCredential) return 'Credential selection is required.';
+                  if (availableRegions.length > 0 && !selectedRegion) return 'Region selection is required.';
+                  if (!selectedOS) return 'Base OS selection is required.';
+                  if (!selectedOSVersion) return 'OS version selection is required.';
+                  if (nodePools.length === 0 || !nodePools.every(pool => pool.count > 0 && (pool.vmSize || (pool.customSize && pool.customSize.cpu > 0 && pool.customSize.memory > 0 && pool.customSize.storage > 0)))) return 'All node pools must have valid count and size.';
+                  if (!selectedK8sDistribution) return 'Kubernetes distribution is required.';
+                  if (!selectedK8sVersion) return 'Kubernetes version is required.';
+                  if (!selectedStorageEngine) return 'Storage engine selection is required.';
+                  if (!selectedStorageVersion && selectedStorageEngine !== 'CloudProvider') return 'Storage engine version is required.';
+                  if (selectedRancherServer && !selectedRancherCredential) return 'Rancher credential is required.';
+                  return 'Please complete all required fields.';
+                })()}
+              </div>
+            )}
+          </div>
         </CardFooter>
       </Card>
     </div>

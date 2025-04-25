@@ -17,6 +17,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { ArrowLeft, Check, Save, Server } from 'lucide-react';
+import { toast } from 'sonner';
 import { 
   getCredentialById,
   CredentialType 
@@ -342,6 +343,8 @@ export default function CreateClusterConfirmPage() {
     setIsLoading(true);
     
     try {
+      console.log('Saving template:', templateName);
+      
       // Prepare template data - ensure we're not including complex objects that can't be serialized
       const simplifiedNodePools = Array.isArray(nodePools) ? nodePools.map((pool: any) => ({
         role: pool?.role || 'worker',
@@ -389,18 +392,27 @@ export default function CreateClusterConfirmPage() {
 
       if (error) {
         console.error('Error saving template:', error);
-        setSaveError('Failed to save template: ' + error.message);
+        setSaveError(`Failed to save template: ${error.message}`);
         setIsLoading(false);
         return;
       }
 
-      // Close dialog and navigate to templates page
+      console.log('Template saved successfully:', data);
+      
+      // Show success message and close dialog
       setSaveDialogOpen(false);
       setIsLoading(false);
-      router.push('/apps/abops/clusters/templates?saved=true');
-    } catch (error) {
+      
+      // Use toast notification for success
+      toast.success('Template saved successfully');
+      
+      // Navigate to templates page
+      setTimeout(() => {
+        router.push('/apps/abops/clusters/templates?saved=true');
+      }, 1000);
+    } catch (error: any) {
       console.error('Error saving template:', error);
-      setSaveError('An unexpected error occurred');
+      setSaveError(`Failed to save template: ${error?.message || 'Unknown error'}`);
       setIsLoading(false);
     }
   };
